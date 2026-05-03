@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Summit">
+<title>The Summit — Utah Football Recruiting</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+:root{
+  --red:#CC0000;--rdim:rgba(204,0,0,0.12);--rglow:rgba(204,0,0,0.3);
+  --bg:#0A0E1A;--s1:#141824;--s2:#1E2332;--s3:#252d40;
+  --w1:#F8F9FC;--w2:rgba(248,249,252,0.65);--w3:rgba(248,249,252,0.38);--w4:rgba(248,249,252,0.16);
+  --sep:rgba(248,249,252,0.08);--sep2:rgba(248,249,252,0.05);
+  --grn:#30D158;--gdim:rgba(48,209,88,0.12);
+  --amb:#FFB340;--adim:rgba(255,179,64,0.12);
+  --blu:#4A9EFF;--bdim:rgba(74,158,255,0.12);
+  --pur:#BF5AF2;--pdim:rgba(191,90,242,0.12);
+  --safe-t:env(safe-area-inset-top,44px);
+  --safe-b:env(safe-area-inset-bottom,20px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--w1)}
+body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+
+/* ── SHELL ── */
+#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden;max-width:1024px;margin:0 auto}
+#sb{height:var(--safe-t);background:var(--bg);flex-shrink:0}
+
+/* ── HEADER ── */
+#hdr{background:var(--bg);border-bottom:0.5px solid var(--sep);padding:0 16px;flex-shrink:0}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;height:48px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-text{font-size:20px;font-weight:800;color:var(--w1);letter-spacing:-0.3px}
+.logo-text b{color:var(--red);font-weight:800}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.coach-chips{display:flex;gap:5px;flex-wrap:wrap}
+.cchip{height:28px;padding:0 12px;border-radius:100px;border:1px solid var(--sep);font-size:11px;font-weight:700;color:var(--w3);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;white-space:nowrap}
+.cchip.on{background:var(--red);color:#fff;border-color:var(--red)}
+.bell{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.bell-badge{position:absolute;top:0;right:0;width:13px;height:13px;border-radius:50%;background:var(--red);border:2.5px solid var(--bg);animation:glow 2s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 var(--rglow)}50%{box-shadow:0 0 0 5px rgba(204,0,0,0)}}
+
+/* ── YEAR TABS ── */
+.yr-row{display:flex;gap:6px;padding:7px 0}
+.yr{flex:1;height:34px;border-radius:100px;border:1.5px solid var(--sep);font-size:16px;font-weight:700;color:var(--w3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s}
+.yr.on{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* ── POSITION FILTER ── */
+.pos-row{display:flex;gap:5px;padding:6px 0 9px;overflow-x:auto;scrollbar-width:none}
+.pos-row::-webkit-scrollbar{display:none}
+.pos{height:30px;padding:0 13px;border-radius:100px;border:1px solid var(--sep);font-size:13px;font-weight:700;color:var(--w3);white-space:nowrap;flex-shrink:0;display:flex;align-items:center;cursor:pointer;transition:all 0.2s}
+.pos.on{background:rgba(204,0,0,0.15);color:var(--red);border-color:rgba(204,0,0,0.4)}
+
+/* ── NAV ── */
+#nav{display:flex;background:var(--bg);border-bottom:0.5px solid var(--sep);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+.nt{flex-shrink:0;height:40px;padding:0 16px;font-size:12px;font-weight:700;color:var(--w3);border-bottom:2.5px solid transparent;cursor:pointer;transition:all 0.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.nt.on{color:var(--w1);border-bottom-color:var(--red)}
+.nt svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:0.7}
+.nt.on svg{opacity:1}
+
+/* ── CONTENT ── */
+#scroll{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.pane{display:none;flex:1;overflow:hidden;flex-direction:column}
+.pane.on{display:flex}
+
+/* ── SPLIT ── */
+.split{display:flex;flex:1;overflow:hidden}
+.split-l{width:340px;flex-shrink:0;border-right:0.5px solid var(--sep);overflow-y:auto;scrollbar-width:none}
+.split-l::-webkit-scrollbar{display:none}
+.split-r{flex:1;overflow-y:auto;scrollbar-width:none;background:#0c1018}
+.split-r::-webkit-scrollbar{display:none}
+@media(max-width:767px){
+  .split-l{width:100%}
+  .split-r{display:none;position:fixed;inset:0;z-index:60;background:#0c1018;overflow-y:auto}
+  .split-r.open{display:block}
+}
+
+/* ── SECTION LABEL ── */
+.slbl{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 5px}
+.slbl-t{font-size:10px;font-weight:800;color:var(--w3);text-transform:uppercase;letter-spacing:0.08em}
+.slbl-c{font-size:10px;font-weight:700;color:var(--red)}
+
+/* ── TIER ── */
+.tier{display:flex;align-items:center;gap:8px;padding:14px 14px 5px}
+.tier-name{font-size:12px;font-weight:800;color:var(--w3);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap}
+.tier-line{flex:1;height:0.5px;background:var(--sep)}
+.tier-ct{font-size:11px;font-weight:700;color:var(--w3)}
+
+/* ── RECRUIT CARD ── */
+.rc{display:flex;align-items:center;gap:11px;padding:13px 14px;margin:0 10px 7px;background:var(--s1);border-radius:13px;border:0.5px solid var(--sep);cursor:pointer;transition:border-color 0.15s,background 0.15s}
+.rc:hover,.rc.sel{border-color:rgba(74,158,255,0.3);background:#131c2e}
+.rc.cm{background:#0a1410;border-color:rgba(48,209,88,0.2)}
+.rc.cm.sel,.rc.cm:hover{border-color:rgba(48,209,88,0.45)}
+.rc.ug{background:#140909;border-color:rgba(204,0,0,0.22)}
+.rc.ug.sel,.rc.ug:hover{border-color:rgba(204,0,0,0.5)}
+.rc-av{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.rc-body{flex:1;min-width:0}
+.rc-name{font-size:18px;font-weight:800;color:var(--w1);letter-spacing:-0.3px;margin-bottom:2px}
+.rc-school{font-size:13px;color:var(--w3);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-status{font-size:13px;font-weight:700}
+.cg{color:var(--grn)}.cr{color:var(--red)}.ca{color:var(--amb)}.cb{color:var(--blu)}.cp{color:var(--pur)}
+.dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.dg{background:var(--grn)}.dr{background:var(--red);box-shadow:0 0 6px var(--rglow)}.da{background:var(--amb)}
+
+/* ── CALL PREP PANEL ── */
+.cp-wrap{padding:18px}
+.cp-back{font-size:14px;font-weight:700;color:var(--blu);margin-bottom:12px;display:flex;align-items:center;gap:5px;cursor:pointer}
+.cp-name{font-size:26px;font-weight:900;color:var(--w1);letter-spacing:-0.6px;line-height:1;margin-bottom:3px}
+.cp-sub{font-size:13px;color:var(--w3);margin-bottom:14px;line-height:1.5}
+.cp-status-bar{display:flex;align-items:center;gap:12px;background:var(--s1);border-radius:12px;padding:13px 15px;margin-bottom:14px;border:0.5px solid var(--sep)}
+.cp-status-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0}
+.cp-status-main{font-size:15px;font-weight:700;margin-bottom:2px}
+.cp-status-sub{font-size:12px;color:var(--w3)}
+.cp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cp-card{background:var(--s1);border-radius:11px;padding:13px;border:0.5px solid var(--sep)}
+.cp-card.full{grid-column:1/-1}
+.cc-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--w3);margin-bottom:9px}
+/* People rows inside call prep */
+.pr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--sep2)}
+.pr:last-child{border-bottom:none}
+.pr-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.pr-name{font-size:13px;font-weight:700;color:var(--w1);margin-bottom:1px}
+.pr-role{font-size:11px;color:var(--w3)}
+.pr-phone{font-size:13px;font-weight:600;color:var(--blu);flex-shrink:0;margin-left:auto}
+/* Offer tags */
+.otags{display:flex;flex-wrap:wrap;gap:5px}
+.otag{height:24px;padding:0 10px;border-radius:100px;background:var(--s2);font-size:12px;font-weight:600;color:var(--w2);display:inline-flex;align-items:center}
+.otag.ours{background:rgba(204,0,0,0.15);color:#FF7070}
+/* Stats text */
+.stats-text{font-size:13px;color:var(--w2);line-height:1.65}
+/* Action buttons */
+.cp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cpb{height:48px;border-radius:13px;border:none;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;transition:opacity 0.15s,transform 0.12s}
+.cpb:active{opacity:0.85;transform:scale(0.96)}
+.cpb-call{background:var(--grn);color:#000;grid-column:1/-1}
+.cpb-text{background:var(--red);color:#fff}
+.cpb-x{background:var(--s2);color:var(--w1)}
+.cpb-done{background:var(--s2);color:var(--w2)}
+.cpb-note{background:var(--s2);color:var(--w2);grid-column:1/-1}
+.src-note{font-size:10px;color:var(--w3);text-align:center;padding:8px;border-top:0.5px solid var(--sep);margin-top:4px}
+
+/* ── MY RECRUITS TAB ── */
+/* Correct: shows only the recruit players the coach is working */
+.rec-card{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:0.5px solid var(--sep2);cursor:pointer;transition:background 0.12s}
+.rec-card:hover{background:rgba(255,255,255,0.02)}
+.rec-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.rec-body{flex:1;min-width:0}
+.rec-name{font-size:17px;font-weight:700;color:var(--w1);margin-bottom:2px}
+.rec-school{font-size:13px;color:var(--w3);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-issue{font-size:13px;font-weight:700;color:var(--red)}
+.rec-ok{font-size:13px;font-weight:700;color:var(--grn)}
+.rec-watch{font-size:13px;font-weight:700;color:var(--amb)}
+.rec-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.rec-time{font-size:12px;color:var(--w3)}
+.issue-why{font-size:11px;font-weight:700;background:rgba(204,0,0,0.15);color:#FF7070;padding:2px 8px;border-radius:20px}
+.watch-why{font-size:11px;font-weight:700;background:rgba(255,179,64,0.15);color:var(--amb);padding:2px 8px;border-radius:20px}
+.ok-why{font-size:11px;font-weight:700;background:rgba(48,209,88,0.12);color:var(--grn);padding:2px 8px;border-radius:20px}
+
+/* Recruit detail (right panel for My Recruits) */
+.rd{padding:18px}
+.rd-section{margin-bottom:16px}
+.rd-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--w3);margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid var(--sep)}
+
+/* ── WAR ROOM ── */
+.wr-scroll{flex:1;overflow-y:auto;scrollbar-width:none}
+.wr-scroll::-webkit-scrollbar{display:none}
+.dash{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+@media(min-width:768px){.dash{grid-template-columns:repeat(3,1fr)}}
+.dc{background:var(--s1);border:0.5px solid var(--sep);border-radius:13px;padding:16px;cursor:pointer;transition:border-color 0.15s}
+.dc:hover{border-color:rgba(74,158,255,0.25)}
+.dc.full{grid-column:1/-1}
+.dc-num{font-size:32px;font-weight:900;letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.dc-lbl{font-size:10px;font-weight:700;color:var(--w3);text-transform:uppercase;letter-spacing:0.06em}
+.dc-sub{font-size:12px;font-weight:600;margin-top:5px}
+/* Position breakdown in war room */
+.pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px 12px}
+@media(min-width:768px){.pos-grid{grid-template-columns:repeat(4,1fr)}}
+.pos-card{background:var(--s1);border:0.5px solid var(--sep);border-radius:11px;padding:12px;cursor:pointer}
+.pos-card:hover{border-color:rgba(74,158,255,0.25)}
+.pc-pos{font-size:14px;font-weight:800;color:var(--w1);margin-bottom:3px}
+.pc-commits{font-size:13px;font-weight:700;margin-bottom:2px}
+.pc-offers{font-size:12px;color:var(--w3)}
+/* Bar chart */
+.chart{background:var(--s1);border:0.5px solid var(--sep);border-radius:13px;padding:14px;margin:0 12px 12px}
+.chart-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--w3);margin-bottom:12px}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.bar-lbl{font-size:13px;font-weight:600;color:var(--w2);width:40px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:18px;background:var(--s2);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:700;white-space:nowrap}
+.bar-val{font-size:13px;font-weight:700;width:22px;flex-shrink:0}
+
+/* ── INTEL FEED ── */
+.intel-scroll{flex:1;overflow-y:auto;scrollbar-width:none}
+.intel-scroll::-webkit-scrollbar{display:none}
+.intel-hdr{background:var(--bg);border-bottom:0.5px solid var(--sep);padding:9px 14px;font-size:13px;color:var(--w3);flex-shrink:0}
+.intel-item{display:flex;gap:11px;padding:13px 14px;border-bottom:0.5px solid var(--sep2);cursor:pointer;transition:background 0.12s}
+.intel-item:hover{background:rgba(255,255,255,0.015)}
+.intel-item.hot{border-left:2.5px solid var(--red);background:rgba(204,0,0,0.04)}
+.intel-item.good{border-left:2.5px solid var(--grn);background:rgba(48,209,88,0.03)}
+.intel-item.watch{border-left:2.5px solid var(--amb);background:rgba(255,179,64,0.03)}
+.intel-item.info{border-left:2.5px solid var(--blu)}
+.ii-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ii-body{flex:1;min-width:0}
+.ii-title{font-size:15px;font-weight:700;color:var(--w1);margin-bottom:3px;line-height:1.3}
+.ii-desc{font-size:13px;color:var(--w3);line-height:1.45}
+.ii-time{font-size:12px;color:var(--w3);margin-top:3px}
+.ii-arr{font-size:20px;color:var(--w4);flex-shrink:0;align-self:center}
+
+/* ── WATCH LIST ── */
+.wl-scroll{flex:1;overflow-y:auto;scrollbar-width:none}
+.wl-scroll::-webkit-scrollbar{display:none}
+.wl-hdr{padding:10px 14px;font-size:13px;color:var(--w3);border-bottom:0.5px solid var(--sep);flex-shrink:0;line-height:1.5}
+.wl-item{display:flex;align-items:center;gap:11px;padding:12px 14px;margin:0 10px 7px;background:var(--s1);border-radius:13px;border:0.5px solid var(--sep);cursor:pointer;transition:border-color 0.15s}
+.wl-item:hover{border-color:rgba(74,158,255,0.25)}
+.wl-av{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.wl-body{flex:1;min-width:0}
+.wl-name{font-size:17px;font-weight:700;color:var(--w1);margin-bottom:2px}
+.wl-school{font-size:13px;color:var(--w3);margin-bottom:3px}
+.wl-tag{height:20px;padding:0 9px;border-radius:100px;font-size:11px;font-weight:700;display:inline-flex;align-items:center}
+.tp{background:var(--pdim);color:var(--pur)}
+.tb{background:var(--bdim);color:var(--blu)}
+.ta{background:var(--adim);color:var(--amb)}
+.wl-yr{font-size:13px;font-weight:700;color:var(--w3);flex-shrink:0}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 10px 12px;height:48px;border-radius:13px;border:1.5px dashed rgba(255,255,255,0.15);cursor:pointer;font-size:14px;font-weight:700;color:var(--w3);transition:border-color 0.2s}
+.add-btn:hover{border-color:rgba(255,255,255,0.3)}
+
+/* ── PORTAL ── */
+.portal-scroll{flex:1;overflow-y:auto;scrollbar-width:none}
+.portal-scroll::-webkit-scrollbar{display:none}
+.need-section{background:var(--s1);border:0.5px solid rgba(191,90,242,0.2);border-radius:13px;margin:10px 10px 0;padding:13px}
+.need-hd{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;color:var(--pur);margin-bottom:10px}
+.need-row{margin-bottom:14px}
+.need-row:last-child{margin-bottom:0}
+.need-pos-name{font-size:16px;font-weight:800;color:var(--w1);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.nb{height:20px;padding:0 9px;border-radius:100px;font-size:10px;font-weight:700;display:inline-flex;align-items:center}
+.nb-r{background:rgba(204,0,0,0.15);color:#FF7070}
+.nb-a{background:var(--adim);color:var(--amb)}
+.nb-g{background:var(--gdim);color:var(--grn)}
+.portal-match{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--s2);border-radius:10px;margin-bottom:5px;cursor:pointer;transition:background 0.12s;border:0.5px solid var(--sep)}
+.portal-match:hover{background:var(--s3)}
+.pm-av{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.pm-body{flex:1;min-width:0}
+.pm-name{font-size:15px;font-weight:700;color:var(--w1);margin-bottom:1px}
+.pm-school{font-size:12px;color:var(--w3)}
+.pm-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.pm-clock{font-size:13px;font-weight:700;color:var(--pur)}
+.pm-pre{font-size:11px;font-weight:700;color:var(--grn)}
+.pt-live{background:var(--pdim);color:var(--pur);height:18px;padding:0 8px;border-radius:100px;font-size:10px;font-weight:700;display:inline-flex;align-items:center}
+
+/* ── ALERTS SHEET ── */
+#alert-overlay{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.72)}
+#alert-overlay.open{display:flex}
+#alert-sheet{background:var(--s1);border-radius:22px 22px 0 0;width:100%;max-width:600px;max-height:85dvh;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(var(--safe-b) + 8px)}
+#alert-sheet::-webkit-scrollbar{display:none}
+.a-handle{width:34px;height:3px;background:var(--s3);border-radius:2px;margin:10px auto 14px}
+.a-title{font-size:22px;font-weight:800;color:var(--w1);padding:0 16px;margin-bottom:14px;letter-spacing:-0.4px}
+.a-item{padding:13px 16px;border-bottom:0.5px solid var(--sep2)}
+.a-item:last-child{border-bottom:none}
+.a-top{display:flex;gap:10px;margin-bottom:11px;align-items:flex-start}
+.a-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.a-crit{background:rgba(204,0,0,0.15)}.a-birth{background:var(--gdim)}.a-warn{background:var(--adim)}.a-port{background:var(--pdim)}
+.a-body{flex:1}
+.a-name{font-size:16px;font-weight:700;color:var(--w1);margin-bottom:4px;line-height:1.3}
+.a-desc{font-size:14px;color:var(--w2);line-height:1.5}
+.a-time{font-size:12px;color:var(--w3);margin-top:4px}
+.a-btns{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.a-btn{height:44px;border-radius:12px;font-size:14px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;transition:opacity 0.15s}
+.a-btn:active{opacity:0.8}
+.ab-call{background:var(--grn);color:#000}
+.ab-text{background:var(--red);color:#fff}
+.ab-x{background:var(--s2);color:var(--w1)}
+.ab-dis{background:var(--s2);color:var(--w3)}
+.ab-full{grid-column:1/-1}
+
+/* ── BOTTOM NAV (mobile) ── */
+#bnav{background:rgba(10,14,26,0.96);border-top:0.5px solid var(--sep);display:flex;padding:6px 0 calc(var(--safe-b) + 2px);position:fixed;bottom:0;left:0;right:0;z-index:40;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+@media(min-width:768px){#bnav{display:none}}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:2px 0}
+.bn svg{width:22px;height:22px;stroke:var(--w3);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke 0.2s}
+.bn span{font-size:9px;font-weight:700;color:var(--w3);letter-spacing:0.02em;transition:color 0.2s;text-align:center}
+.bn.on svg{stroke:var(--red)}.bn.on span{color:var(--red)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:calc(var(--safe-b) + 68px);left:50%;transform:translateX(-50%);background:rgba(30,35,50,0.97);color:var(--w1);font-size:13px;font-weight:600;padding:10px 20px;border-radius:100px;z-index:200;display:none;white-space:nowrap;border:0.5px solid var(--sep);max-width:90vw;text-align:center}
+#toast.show{display:block;animation:tin 0.22s cubic-bezier(.4,0,.2,1)}
+@keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="sb"></div>
+
+<!-- ══ HEADER ══ -->
+<div id="hdr">
+  <div class="hdr-row">
+    <div class="logo">
+      <svg width="28" height="32" viewBox="0 0 120 135" fill="none">
+        <text x="2" y="25" font-family="Arial Black,sans-serif" font-weight="900" font-size="22" fill="#CC0000" letter-spacing="3">UTAH</text>
+        <path d="M8 35L8 92Q8 126 60 126Q112 126 112 92L112 35L88 35L88 92Q88 106 60 106Q32 106 32 92L32 35Z" fill="#CC0000"/>
+        <path d="M32 35L32 92Q32 106 60 106Q88 106 88 92L88 35L72 35L72 92Q72 98 60 98Q48 98 48 92L48 35Z" fill="#0A0E1A"/>
+      </svg>
+      <span class="logo-text">THE <b>SUMMIT</b></span>
+    </div>
+    <div class="hdr-right">
+      <div class="coach-chips" id="coach-chips">
+        <div class="cchip on" onclick="swCoach('scalley',this)">Scalley · HC</div>
+        <div class="cchip" onclick="swCoach('breck',this)">Breckterfield · EDGE</div>
+        <div class="cchip" onclick="swCoach('gross',this)">Gross · OL</div>
+        <div class="cchip" onclick="swCoach('swan',this)">Swan · DC</div>
+      </div>
+      <div class="bell" onclick="openAlerts()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(248,249,252,0.7)" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="bell-badge"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Year tabs — only show on board and watchlist -->
+  <div class="yr-row" id="yr-row" style="display:none">
+    <div class="yr" id="yr-2026" onclick="swYr('2026',this)">2026</div>
+    <div class="yr on" id="yr-2027" onclick="swYr('2027',this)">2027</div>
+    <div class="yr" id="yr-2028" onclick="swYr('2028',this)">2028</div>
+    <div class="yr" id="yr-2029" onclick="swYr('2029',this)">2029</div>
+  </div>
+  <!-- Position filter — show on board -->
+  <div class="pos-row" id="pos-row" style="display:none">
+    <div class="pos on" id="pos-all" onclick="swPos('all',this)">All Positions</div>
+    <div class="pos" onclick="swPos('QB',this)">QB</div>
+    <div class="pos" onclick="swPos('RB',this)">RB</div>
+    <div class="pos" onclick="swPos('WR',this)">WR</div>
+    <div class="pos" onclick="swPos('TE',this)">TE</div>
+    <div class="pos" onclick="swPos('OT',this)">OT</div>
+    <div class="pos" onclick="swPos('IOL',this)">IOL</div>
+    <div class="pos" onclick="swPos('EDGE',this)">EDGE</div>
+    <div class="pos" onclick="swPos('DL',this)">DL</div>
+    <div class="pos" onclick="swPos('LB',this)">LB</div>
+    <div class="pos" onclick="swPos('CB',this)">CB</div>
+    <div class="pos" onclick="swPos('S',this)">S</div>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<div id="nav">
+  <div class="nt on" onclick="swTab('board',this)" id="nt-board"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>The Board</div>
+  <div class="nt" onclick="swTab('recruits',this)" id="nt-recruits"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>My Recruits</div>
+  <div class="nt" onclick="swTab('warroom',this)" id="nt-warroom"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>War Room</div>
+  <div class="nt" onclick="swTab('intel',this)" id="nt-intel"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Intel Feed</div>
+  <div class="nt" onclick="swTab('watchlist',this)" id="nt-watchlist"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Watch List</div>
+  <div class="nt" onclick="swTab('portal',this)" id="nt-portal"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Transfer Portal</div>
+</div>
+
+<div id="scroll">
+
+<!-- ══════════ THE BOARD ══════════ -->
+<div class="pane on" id="pane-board">
+  <div class="split">
+    <div class="split-l" id="board-list">
+      <div id="board-cards"></div>
+      <div class="src-note">Data: On3 · 247Sports · Rivals · SI · May 2, 2026</div>
+    </div>
+    <div class="split-r" id="board-right">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;padding:40px;opacity:0.4">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--w1)" stroke-width="1.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <p style="font-size:15px;font-weight:600;color:var(--w1);text-align:center">Tap any recruit to open their full profile and call prep</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MY RECRUITS ══════════ -->
+<!-- This tab shows ONLY the players (recruits) this coach is working.
+     Parent names, HS coach names, phone numbers live INSIDE each recruit's profile — not as separate entries here. -->
+<div class="pane" id="pane-recruits">
+  <div class="split">
+    <div class="split-l">
+      <div class="slbl" style="padding-top:12px">
+        <span class="slbl-t" id="rec-lbl">Breckterfield's Recruits</span>
+        <span class="slbl-c" id="rec-ct"></span>
+      </div>
+      <div style="padding:0 14px 8px;font-size:13px;color:var(--w3)">The players you are actively recruiting. Tap any name to see their full profile, family contacts, and to call or text.</div>
+      <div id="rec-cards"></div>
+    </div>
+    <div class="split-r" id="rec-right">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;padding:40px;opacity:0.4">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--w1)" stroke-width="1.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <p style="font-size:15px;font-weight:600;color:var(--w1);text-align:center">Tap a recruit to see their full profile, family contacts, offer list, and contact options</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ WAR ROOM ══════════ -->
+<!-- Defaults to all positions, all coaches. Filter by position to drill down. -->
+<div class="pane" id="pane-warroom">
+  <div class="wr-scroll">
+    <div class="slbl" style="padding-top:12px">
+      <span class="slbl-t">2027 Class — All Positions</span>
+      <span class="slbl-c" onclick="toast('Full class detail')">Tap to drill down</span>
+    </div>
+    <div class="dash">
+      <div class="dc" onclick="toast('4 commits: Parks, Henderson, Teeples — and Thatcher pending verification')">
+        <div class="dc-num" style="color:var(--grn)">3</div>
+        <div class="dc-lbl">Committed</div>
+        <div class="dc-sub" style="color:var(--grn)">Parks · Henderson · Teeples</div>
+      </div>
+      <div class="dc" onclick="toast('16 active offers out across all positions')">
+        <div class="dc-num" style="color:var(--amb)">16</div>
+        <div class="dc-lbl">Offers Out</div>
+        <div class="dc-sub" style="color:var(--w3)">All positions</div>
+      </div>
+      <div class="dc" onclick="toast('Official visits: Joshua June 5, Hildebrand June 15')">
+        <div class="dc-num" style="color:var(--blu)">2</div>
+        <div class="dc-lbl">Official Visits</div>
+        <div class="dc-sub" style="color:var(--blu)">Jun 5 + Jun 15</div>
+      </div>
+      <div class="dc" onclick="toast('Dead period: June 1–14. No in-person contact.')">
+        <div class="dc-num" style="color:var(--amb)">30</div>
+        <div class="dc-lbl">Days to Dead Period</div>
+        <div class="dc-sub" style="color:var(--red)">June 1 — act now</div>
+      </div>
+      <div class="dc" onclick="toast('Jordan Walker live · Marcus Hayes pre-portal · Tyler James pre-portal')">
+        <div class="dc-num" style="color:var(--pur)">3</div>
+        <div class="dc-lbl">Portal Targets</div>
+        <div class="dc-sub" style="color:var(--pur)">1 live · 2 watching</div>
+      </div>
+      <div class="dc" onclick="toast('Utah 2027 class ranked 66th nationally per On3. Big 12 rank: 7th.')">
+        <div class="dc-num" style="color:var(--red)">66</div>
+        <div class="dc-lbl">National Ranking</div>
+        <div class="dc-sub" style="color:var(--w3)">2027 class · On3</div>
+      </div>
+    </div>
+
+    <!-- Scholarship needs bar chart -->
+    <div class="chart">
+      <div class="chart-title">Scholarship spots still needed by position</div>
+      <div class="bar"><div class="bar-lbl">OT</div><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--red);color:#fff">2 spots open — critical</div></div><div class="bar-val" style="color:var(--red)">2</div></div>
+      <div class="bar"><div class="bar-lbl">EDGE</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--amb);color:#000">1 spot open</div></div><div class="bar-val" style="color:var(--amb)">1</div></div>
+      <div class="bar"><div class="bar-lbl">IOL</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--amb);color:#000">1 spot open</div></div><div class="bar-val" style="color:var(--amb)">1</div></div>
+      <div class="bar"><div class="bar-lbl">WR</div><div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--blu);color:#fff">1 spot open</div></div><div class="bar-val" style="color:var(--blu)">1</div></div>
+      <div class="bar"><div class="bar-lbl">CB</div><div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--blu);color:#fff">1 spot open</div></div><div class="bar-val" style="color:var(--blu)">1</div></div>
+      <div class="bar"><div class="bar-lbl">LB</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--grn);color:#000">Good</div></div><div class="bar-val" style="color:var(--grn)">0</div></div>
+    </div>
+
+    <!-- Position breakdown grid -->
+    <div class="slbl"><span class="slbl-t">By Position — Tap Any</span></div>
+    <div class="pos-grid">
+      <div class="pos-card" onclick="toast('OT: Jake Hildebrand (OV Jun 15), Mason Joshua (OV Jun 5), Rashaun Lavata\'i, Gecova Doyal, Calvin Moala, DaJohn Yarborough, Ian Aloisio')">
+        <div class="pc-pos">OT / IOL</div>
+        <div class="pc-commits" style="color:var(--grn)">0 committed</div>
+        <div class="pc-offers">7 offers out · 2 OVs set</div>
+      </div>
+      <div class="pos-card" onclick="toast('EDGE: Henderson committed · Graves, Lokey, Brown, Ioane, Wolfgramm, Eboigbodin offered')">
+        <div class="pc-pos">EDGE / DL</div>
+        <div class="pc-commits" style="color:var(--grn)">2 committed</div>
+        <div class="pc-offers">Henderson · Teeples · 6 offers</div>
+      </div>
+      <div class="pos-card" onclick="toast('LB: Sam Ngata (Olympus HS SLC), Davon Smith (Westfield TX)')">
+        <div class="pc-pos">LB</div>
+        <div class="pc-commits" style="color:var(--amb)">0 committed</div>
+        <div class="pc-offers">2 offers out</div>
+      </div>
+      <div class="pos-card" onclick="toast('CB: Jernaro Gilford (Skyridge UT #1 CB), Will Rasmussen (Orem UT)')">
+        <div class="pc-pos">CB / S</div>
+        <div class="pc-commits" style="color:var(--amb)">0 committed</div>
+        <div class="pc-offers">2 offers out</div>
+      </div>
+      <div class="pos-card" onclick="toast('WR: Kingston Parks committed (Nov 2025) · Bode Sparrow, Darion Moseley (OV Jun 12), Ronnie Gomiller')">
+        <div class="pc-pos">WR / TE</div>
+        <div class="pc-commits" style="color:var(--grn)">1 committed</div>
+        <div class="pc-offers">Parks locked · 3 offers</div>
+      </div>
+      <div class="pos-card" onclick="toast('QB: Thaddeus Thatcher committed (Mar 2025, pending verification). No other active QB offers.')">
+        <div class="pc-pos">QB</div>
+        <div class="pc-commits" style="color:var(--grn)">1 committed</div>
+        <div class="pc-offers">Thatcher (verify status)</div>
+      </div>
+    </div>
+
+    <!-- Class status list -->
+    <div class="slbl"><span class="slbl-t">2027 Class Status</span></div>
+    <div style="background:var(--s1);border:0.5px solid var(--sep);border-radius:13px;margin:0 12px 12px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--sep2)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--grn);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">Kingston Parks — WR · Arlington TX</div><div style="font-size:12px;color:var(--w3)">Committed Nov 20, 2025 · ★★★ · 247 WR #113</div></div>
+        <div style="font-size:11px;font-weight:700;background:var(--gdim);color:var(--grn);padding:2px 9px;border-radius:20px">Locked</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--sep2)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--grn);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">Jack Henderson — EDGE · Boise ID</div><div style="font-size:12px;color:var(--w3)">Committed Apr 4, 2026 · ★★★ Idaho #1 · 6'3" 235</div></div>
+        <div style="font-size:11px;font-weight:700;background:var(--gdim);color:var(--grn);padding:2px 9px;border-radius:20px">Locked</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--sep2)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--grn);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">Tiki Teeples — DL · Waddell AZ</div><div style="font-size:12px;color:var(--w3)">Committed Apr 22, 2026 · ★★★ AZ DL #24 · 6'4" 265</div></div>
+        <div style="font-size:11px;font-weight:700;background:var(--gdim);color:var(--grn);padding:2px 9px;border-radius:20px">Locked</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--sep2)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amb);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">Jake Hildebrand — OT · Chandler AZ</div><div style="font-size:12px;color:var(--w3)">OV June 15–17 · ★★★★ 247 OT #11 · Final 4: Utah, TxA&M, Oregon, ASU</div></div>
+        <div style="font-size:11px;font-weight:700;background:var(--adim);color:var(--amb);padding:2px 9px;border-radius:20px">OV in 44d</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amb);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">Mason Joshua — OT · Forney TX</div><div style="font-size:12px;color:var(--w3)">OV June 5–7 · ★★★ 247 OT #43 · Decides July 4 · 8 finalists</div></div>
+        <div style="font-size:11px;font-weight:700;background:var(--adim);color:var(--amb);padding:2px 9px;border-radius:20px">OV in 34d</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ INTEL FEED ══════════ -->
+<!-- Defaults to current coach's position group. "All" button shows everything. -->
+<div class="pane" id="pane-intel">
+  <div class="intel-hdr" id="intel-hdr-text">Showing: Breckterfield's positions (EDGE / DL) — <span style="color:var(--blu);cursor:pointer;font-weight:700" onclick="toast('Showing all positions')">Tap here for all positions</span></div>
+  <div class="intel-scroll">
+    <div class="intel-item hot" onclick="selIntel('graves')">
+      <div class="ii-ico" style="background:rgba(204,0,0,0.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF7070" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div>
+      <div class="ii-body">
+        <div class="ii-title">Braiden Graves — 5 days no contact, spring eval closes May 31</div>
+        <div class="ii-desc">Offer is out. Spring evaluation period closes in 29 days. He needs to hear from you today or this week.</div>
+        <div class="ii-time">Today · Your board</div>
+      </div>
+      <div class="ii-arr">›</div>
+    </div>
+    <div class="intel-item good" onclick="selIntel('teeples')">
+      <div class="ii-ico" style="background:var(--gdim)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--grn)" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="ii-body">
+        <div class="ii-title">Tiki Teeples committed to Utah — April 22</div>
+        <div class="ii-desc">Canyon View HS AZ · DL · 6'4" 265 · Chose Utah over Iowa State, Texas Tech, West Virginia. 12.5 sacks junior year.</div>
+        <div class="ii-time">April 22, 2026 · On3 / 247Sports</div>
+      </div>
+      <div class="ii-arr">›</div>
+    </div>
+    <div class="intel-item good" onclick="selIntel('henderson')">
+      <div class="ii-ico" style="background:var(--gdim)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--grn)" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="ii-body">
+        <div class="ii-title">Jack Henderson committed to Utah — April 4</div>
+        <div class="ii-desc">Bishop Kelly HS ID · EDGE · 6'3" 235 · Idaho #1 · Chose Utah over WSU, SDSU, Fresno State, New Mexico, San Jose State, Air Force.</div>
+        <div class="ii-time">April 4, 2026 · On3 / 247Sports</div>
+      </div>
+      <div class="ii-arr">›</div>
+    </div>
+    <div class="intel-item hot" onclick="toast('Jordan Walker profile opening')">
+      <div class="ii-ico" style="background:var(--pdim)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--pur)" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <div class="ii-body">
+        <div class="ii-title">Jordan Walker entered transfer portal — 28 days left</div>
+        <div class="ii-desc">Utah State OT · 6'6" 305 · 28 career starts · PFF 74.2 · Auto-matched to your critical OT need. Call today.</div>
+        <div class="ii-time">2 days ago · On3 Portal</div>
+      </div>
+      <div class="ii-arr">›</div>
+    </div>
+    <div class="intel-item watch" onclick="selIntel('lokey')">
+      <div class="ii-ico" style="background:var(--adim)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amb)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>
+      <div class="ii-body">
+        <div class="ii-title">Logan Lokey — 8 days no contact, follow-up needed</div>
+        <div class="ii-desc">Denton Guyer HS TX · EDGE · Rowe's teammate. Offer extended January 2026. Last contact 8 days ago.</div>
+        <div class="ii-time">8 days ago · Your board</div>
+      </div>
+      <div class="ii-arr">›</div>
+    </div>
+    <div class="intel-item info" onclick="toast('Rashaun Lavata\'i profile opening — green light, text within 48 hours')">
+      <div class="ii-ico" style="background:var(--bdim)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blu)" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div class="ii-body">
+        <div class="ii-title">Rashaun Lavata'i followed Jordan Gross on X — green light</div>
+        <div class="ii-desc">Curtis Sr. HS WA · IOL · Followed after Utah offer. This signals interest — text within 48 hours.</div>
+        <div class="ii-time">2 days ago · X</div>
+      </div>
+      <div class="ii-arr">›</div>
+    </div>
+    <div class="intel-item watch" onclick="selIntel('hildebrand')">
+      <div class="ii-ico" style="background:var(--adim)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amb)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>
+      <div class="ii-body">
+        <div class="ii-title">Jake Hildebrand liked an ASU post — monitor</div>
+        <div class="ii-desc">Basha HS OT · ASU visit June 12–14 comes before your OV June 15. Watch his social engagement closely.</div>
+        <div class="ii-time">4 hours ago · X</div>
+      </div>
+      <div class="ii-arr">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ WATCH LIST ══════════ -->
+<!-- Defaults to 2027. Tabs to go to 2028 or 2029. -->
+<div class="pane" id="pane-watchlist">
+  <div class="wl-hdr">Players being evaluated — no offer extended yet. Tap + to add a player. Your recruiting coordinator will be notified to review.</div>
+  <div class="wl-scroll">
+    <div class="tier"><div class="tier-name">2027 — Being Evaluated</div><div class="tier-line"></div><div class="tier-ct">4 players</div></div>
+    <div class="wl-item" onclick="toast('Godschoice Eboigbodin — JSerra Catholic CA · 247 EDGE #35 · 10+ P5 offers. Film available. Evaluation in progress.')">
+      <div class="wl-av" style="background:rgba(204,0,0,0.12);color:#FF7070">GE</div>
+      <div class="wl-body">
+        <div class="wl-name">Godschoice Eboigbodin</div>
+        <div class="wl-school">JSerra Catholic · CA · EDGE · 6'5" 235</div>
+        <div class="wl-tag ta">★★★ 247 EDGE #35</div>
+      </div>
+      <div class="wl-yr">2027</div>
+    </div>
+    <div class="wl-item" onclick="toast('Darion Moseley — Thompson HS AL · WR · 6\'0\" 170 · 1,128 rec yards, 7 TDs 2025 · OV June 12-14')">
+      <div class="wl-av" style="background:var(--bdim);color:var(--blu)">DM</div>
+      <div class="wl-body">
+        <div class="wl-name">Darion Moseley</div>
+        <div class="wl-school">Thompson HS · Alabaster, AL · WR · 6'0" 170</div>
+        <div class="wl-tag tb">★★★ OV June 12-14</div>
+      </div>
+      <div class="wl-yr">2027</div>
+    </div>
+    <div class="wl-item" onclick="toast('Sam Ngata — Olympus HS SLC UT · LB · 6\'3.5\" 215 · 247 LB #66 · In-state. Visited campus. Strong geographic advantage.')">
+      <div class="wl-av" style="background:var(--gdim);color:var(--grn)">SN</div>
+      <div class="wl-body">
+        <div class="wl-name">Sam Ngata</div>
+        <div class="wl-school">Olympus HS · Salt Lake City, UT · LB · 6'3.5" 215</div>
+        <div class="wl-tag tb">★★★ 247 LB #66 · In-state</div>
+      </div>
+      <div class="wl-yr">2027</div>
+    </div>
+    <div class="wl-item" onclick="toast('Jernaro Gilford Jr — Skyridge HS Lehi UT · CB · 6\'1\" 170 · 247 CB #39 nationally · Utah\'s #1 CB in the state. In-state advantage.')">
+      <div class="wl-av" style="background:var(--pdim);color:var(--pur)">JG</div>
+      <div class="wl-body">
+        <div class="wl-name">Jernaro Gilford Jr.</div>
+        <div class="wl-school">Skyridge HS · Lehi, UT · CB · 6'1" 170</div>
+        <div class="wl-tag tp">★★★ 247 CB #39 Natl · UT #1</div>
+      </div>
+      <div class="wl-yr">2027</div>
+    </div>
+
+    <div class="tier"><div class="tier-name">2028 — Early Radar</div><div class="tier-line"></div><div class="tier-ct">2 players</div></div>
+    <div class="wl-item" onclick="toast('Isaiah Bertola — Farrington HS Honolulu HI · OT · 6\'5\" 305 · 247 OT #37 in 2028 class. Early evaluation — no offer yet.')">
+      <div class="wl-av" style="background:var(--bdim);color:var(--blu)">IB</div>
+      <div class="wl-body">
+        <div class="wl-name">Isaiah Bertola</div>
+        <div class="wl-school">Farrington HS · Honolulu, HI · OT · 6'5" 305</div>
+        <div class="wl-tag tb">★★★★ 247 OT #37 · 2028</div>
+      </div>
+      <div class="wl-yr">2028</div>
+    </div>
+    <div class="wl-item" onclick="toast('JJ Howard — QB · 2028 · Visited Salt Lake City recently. Checking out Utah program. Early stage.')">
+      <div class="wl-av" style="background:var(--adim);color:var(--amb)">JH</div>
+      <div class="wl-body">
+        <div class="wl-name">JJ Howard</div>
+        <div class="wl-school">2028 · QB · Visited SLC Spring 2026</div>
+        <div class="wl-tag ta">★★★ 2028 QB · Early Look</div>
+      </div>
+      <div class="wl-yr">2028</div>
+    </div>
+
+    <div class="add-btn" onclick="toast('Notifying recruiting coordinator — they will review and add to the system')">
+      <span style="font-size:22px;color:var(--w3);line-height:1">+</span>
+      <span>Add a player — notifies recruiting coordinator</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TRANSFER PORTAL ══════════ -->
+<!-- Organized by position need, then players who fill that need. -->
+<div class="pane" id="pane-portal">
+  <div class="portal-scroll">
+    <div class="slbl" style="padding-top:12px"><span class="slbl-t">Roster Needs — Auto-Matched to Portal</span><span class="slbl-c">Tap any player</span></div>
+    <div class="need-section">
+      <div class="need-hd">Position Needs · Players Available Now</div>
+
+      <!-- OT — CRITICAL -->
+      <div class="need-row">
+        <div class="need-pos-name">Offensive Tackle <span class="nb nb-r">Critical — 2 spots open</span></div>
+        <div class="portal-match" onclick="selPortal('walker')">
+          <div class="pm-av" style="background:rgba(204,0,0,0.12);color:#FF7070">JW</div>
+          <div class="pm-body">
+            <div class="pm-name">Jordan Walker</div>
+            <div class="pm-school">Utah State · OT · 6'6" 305 · 28 career starts · PFF 74.2</div>
+          </div>
+          <div class="pm-right">
+            <span class="pt-live">In Portal</span>
+            <div class="pm-clock">28d left</div>
+          </div>
+        </div>
+        <div class="portal-match" onclick="toast('Tyler James — Nevada · OT · 6\'7\" 305 · 3rd year starter. Pre-portal watch. Snap count stable but team in rebuild. Contact only when portal entry confirmed.')">
+          <div class="pm-av" style="background:var(--gdim);color:var(--grn)">TJ</div>
+          <div class="pm-body">
+            <div class="pm-name">Tyler James</div>
+            <div class="pm-school">Nevada · OT · 6'7" 305 · Pre-portal — team rebuilding</div>
+          </div>
+          <div class="pm-right">
+            <div class="pm-pre">Pre-Portal</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDGE — OPEN -->
+      <div class="need-row">
+        <div class="need-pos-name">Edge Rusher <span class="nb nb-a">1 spot open</span></div>
+        <div class="portal-match" onclick="selPortal('porter')">
+          <div class="pm-av" style="background:var(--pdim);color:var(--pur)">MP</div>
+          <div class="pm-body">
+            <div class="pm-name">Marcus Porter</div>
+            <div class="pm-school">Colorado State · EDGE · 6'4" 250 · 2 years eligibility · PFF 68.1</div>
+          </div>
+          <div class="pm-right">
+            <span class="pt-live">In Portal</span>
+            <div class="pm-clock">19d left</div>
+          </div>
+        </div>
+        <div class="portal-match" onclick="toast('Marcus Hayes — Colorado · EDGE · 6\'4\" 248 · Snap count down 30% under new DC. Follows 3 Utah staff on X. Pre-portal — DO NOT contact yet. NCAA violation if he is still enrolled.')">
+          <div class="pm-av" style="background:var(--gdim);color:var(--grn)">MH</div>
+          <div class="pm-body">
+            <div class="pm-name">Marcus Hayes</div>
+            <div class="pm-school">Colorado · EDGE · 6'4" 248 · Snap count ↓30% · Pre-portal</div>
+          </div>
+          <div class="pm-right">
+            <div class="pm-pre">Pre-Portal</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IOL — OPEN -->
+      <div class="need-row">
+        <div class="need-pos-name">Interior Offensive Line <span class="nb nb-a">1 spot open</span></div>
+        <div class="portal-match" onclick="toast('Devon Carr — Wyoming · IOL · 6\'4\" 305 · New OC installed, different blocking scheme. 2 years eligibility. Pre-portal watch. Build relationship now.')">
+          <div class="pm-av" style="background:var(--adim);color:var(--amb)">DC</div>
+          <div class="pm-body">
+            <div class="pm-name">Devon Carr</div>
+            <div class="pm-school">Wyoming · IOL · 6'4" 305 · New OC · scheme change</div>
+          </div>
+          <div class="pm-right">
+            <div class="pm-pre">Pre-Portal</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LB — SOLID -->
+      <div class="need-row" style="margin-bottom:0">
+        <div class="need-pos-name">Linebacker <span class="nb nb-g">Depth good</span></div>
+        <div style="padding:8px 0;font-size:13px;color:var(--w3)">No portal need at LB. Depth is solid for 2027 class.</div>
+      </div>
+    </div>
+
+    <!-- Roster health -->
+    <div class="slbl"><span class="slbl-t">Roster Health — Your Current Players</span></div>
+    <div style="background:var(--s1);border:0.5px solid var(--sep);border-radius:13px;margin:0 10px 12px;overflow:hidden">
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--sep2)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--red);margin-top:4px;flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">#74 OT — Portal Risk</div><div style="font-size:12px;color:var(--w3);margin-top:2px">Followed portal tracker account on X. Minimal Utah content engagement past 14 days. Check in this week.</div></div>
+        <div style="font-size:11px;font-weight:700;background:rgba(204,0,0,0.15);color:#FF7070;padding:2px 9px;border-radius:20px;flex-shrink:0">At Risk</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--sep2)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amb);margin-top:4px;flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">#52 EDGE — Monitor</div><div style="font-size:12px;color:var(--w3);margin-top:2px">Liked 3 rival program posts this week. Playing time slightly reduced in spring.</div></div>
+        <div style="font-size:11px;font-weight:700;background:var(--adim);color:var(--amb);padding:2px 9px;border-radius:20px;flex-shrink:0">Watch</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--grn);margin-top:4px;flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--w1)">#91 DL — Engaged</div><div style="font-size:12px;color:var(--w3);margin-top:2px">Reposted Utah Football 4x this week. Zero portal signals. Strong retention.</div></div>
+        <div style="font-size:11px;font-weight:700;background:var(--gdim);color:var(--grn);padding:2px 9px;border-radius:20px;flex-shrink:0">Solid</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end scroll -->
+
+<!-- ══ BOTTOM NAV (mobile only) ══ -->
+<div id="bnav">
+  <div class="bn on" id="bn-board" onclick="swTab('board',null,this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <span>Board</span>
+  </div>
+  <div class="bn" id="bn-recruits" onclick="swTab('recruits',null,this)">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>My Recruits</span>
+  </div>
+  <div class="bn" id="bn-warroom" onclick="swTab('warroom',null,this)">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>War Room</span>
+  </div>
+  <div class="bn" id="bn-intel" onclick="swTab('intel',null,this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>Intel Feed</span>
+  </div>
+  <div class="bn" id="bn-watchlist" onclick="swTab('watchlist',null,this)">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>Watch List</span>
+  </div>
+  <div class="bn" id="bn-portal" onclick="swTab('portal',null,this)">
+    <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    <span>Portal</span>
+  </div>
+</div>
+
+<!-- ══ ALERTS SHEET ══ -->
+<div id="alert-overlay" onclick="closeAlerts(event)">
+  <div id="alert-sheet">
+    <div class="a-handle"></div>
+    <div class="a-title">3 Alerts Need Attention</div>
+
+    <div class="a-item">
+      <div class="a-top">
+        <div class="a-ico a-crit"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF7070" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="a-body">
+          <div class="a-name">Braiden Graves — 5 days no contact</div>
+          <div class="a-desc">You have an offer out to Braiden. The spring evaluation period closes May 31 — that is 29 days away. He needs to hear from you this week or you risk losing the relationship. Call him today or send a text referencing a specific play from his spring film.</div>
+          <div class="a-time">Today · Your recruiting board</div>
+        </div>
+      </div>
+      <div class="a-btns">
+        <div class="a-btn ab-call" onclick="toast('Opening call log for Braiden Graves');closeAlerts()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call Now</div>
+        <div class="a-btn ab-text" onclick="toast('Text him from your own phone — reference his spring film specifically');closeAlerts()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Send Text</div>
+        <div class="a-btn ab-x" onclick="toast('Opening Braiden Graves on X')">View on X</div>
+        <div class="a-btn ab-dis" onclick="this.closest('.a-item').style.opacity='0.4'">Dismiss</div>
+      </div>
+    </div>
+
+    <div class="a-item">
+      <div class="a-top">
+        <div class="a-ico a-birth"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--grn)" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <div class="a-body">
+          <div class="a-name">Barbara Henderson — birthday tomorrow, May 3</div>
+          <div class="a-desc">Barbara is Jack Henderson's mother. Jack is committed to Utah. A quick happy birthday text from you goes a long way with committed families and shows you care about more than just the player. She is a key relationship to maintain through signing day.</div>
+          <div class="a-time">Reminder · Tomorrow May 3</div>
+        </div>
+      </div>
+      <div class="a-btns">
+        <div class="a-btn ab-text ab-full" onclick="toast('Send from your own phone: \"Barbara — Coach Breckterfield here. Happy birthday! So excited to have Jack as part of our family. Go Utes!\"');closeAlerts()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Send Birthday Text to Barbara · 208-890-5948</div>
+        <div class="a-btn ab-dis ab-full" onclick="this.closest('.a-item').style.opacity='0.4'">Dismiss</div>
+      </div>
+    </div>
+
+    <div class="a-item">
+      <div class="a-top">
+        <div class="a-ico a-warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amb)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="a-body">
+          <div class="a-name">Dead period starts June 1 — 30 days away</div>
+          <div class="a-desc">From June 1 through June 14, there is no in-person contact with recruits. All in-person visits and evaluations must happen before June 1. Jake Hildebrand's official visit starts June 15 — the same day the dead period ends and unlimited contact opens.</div>
+          <div class="a-time">Compliance reminder · June 1 deadline</div>
+        </div>
+      </div>
+      <div class="a-btns">
+        <div class="a-btn ab-x ab-full" onclick="swTab('warroom');closeAlerts()">View Visit Calendar in War Room</div>
+        <div class="a-btn ab-dis ab-full" onclick="this.closest('.a-item').style.opacity='0.4'">Dismiss</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────
+// All verified: On3, 247Sports, Rivals, SI as of May 2 2026
+// Zane Rowe NOT included — committed to Oregon March 2026
+
+const RECRUITS = [
+  // COMMITTED
+  {id:'parks',pos:'WR',coach:'swan',status:'commit',name:'Kingston Parks',hs:'Oakridge School',city:'Arlington, TX',ht:"6'2\"",wt:'180',stars:3,rank:'247 WR #113',heat:90,shortSt:'Committed Nov 20, 2025 · ★★★',fullSt:'Committed to Utah November 20, 2025. First commit of the 2027 class.',
+   family:[{init:'PF',c:'rgba(74,158,255,0.12)',tc:'#7CB9FF',name:'Parks Family',role:'Arlington TX · Committed early — family bought in',phone:'817-555-0120'}],
+   offers:['Utah ✓','Multiple others'],ourOffer:true,
+   stats:'First commit of the 2027 class. Premium Texas program. 3-star WR from Oakridge School. Chose Utah early — high loyalty signal.',
+   note:'Retention message — keep the relationship warm through signing day.'},
+  {id:'henderson',pos:'EDGE',coach:'breck',status:'commit',name:'Jack Henderson',hs:'Bishop Kelly HS',city:'Boise, ID',ht:"6'3\"",wt:'235',stars:3,rank:'On3 #959 · Idaho #1',heat:91,shortSt:'Committed Apr 4, 2026 · Idaho #1',fullSt:'Committed to Utah April 4, 2026. Idaho\'s #1 recruit. Chose Utah over Washington State, San Diego State, Fresno State, New Mexico, San Jose State, Air Force.',
+   family:[
+     {init:'DH',c:'rgba(74,158,255,0.12)',tc:'#7CB9FF',name:'Dan Henderson',role:'Father · Primary contact',phone:'208-890-5949'},
+     {init:'BH',c:'rgba(255,179,64,0.12)',tc:'#FFD080',name:'Barbara Henderson',role:'Mother · Birthday May 3',phone:'208-890-5948'},
+     {init:'CC',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Coach Chris Culig',role:'Head Coach · Bishop Kelly HS',phone:'208-555-0144'}
+   ],
+   offers:['Utah ✓','Washington State','San Diego State','Fresno State','New Mexico','San Jose State','Air Force'],ourOffer:true,
+   stats:'67 tackles · 24 TFLs · 7 sacks · 35 QB hurries · 3 forced fumbles · 13-0 State Champions · 1st Team All-State Idaho 2025. Multi-sport: football, track, wrestling.',
+   note:'Retention message — Barbara\'s birthday is tomorrow May 3. Send a text to her at 208-890-5948.'},
+  {id:'teeples',pos:'DL',coach:'breck',status:'commit',name:'Tiki Teeples',hs:'Canyon View HS',city:'Waddell, AZ',ht:"6'4\"",wt:'265',stars:3,rank:'247 DL #118 · AZ DL #24',heat:88,shortSt:'Committed Apr 22, 2026 · AZ DL #24',fullSt:'Committed to Utah April 22, 2026. Chose Utah over Iowa State, Texas Tech, West Virginia, Fresno State, Idaho, Utah State.',
+   family:[{init:'TF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Teeples Family',role:'Waddell AZ · Parents involved in decision',phone:'602-555-0188'}],
+   offers:['Utah ✓','Iowa State','Texas Tech','West Virginia','Fresno State','Idaho','Utah State','Boise State'],ourOffer:true,
+   stats:'63 tackles · 18 TFLs · 12.5 sacks junior season · 2nd team all-state · 525 lb squat · 365 lb bench. Frame projects to add 30-40 lbs in Utah S&C program.',
+   note:'Retention — reinforce the decision, build excitement for enrollment.'},
+  // BRECK TARGETS
+  {id:'graves',pos:'EDGE',coach:'breck',status:'top',name:'Braiden Graves',hs:'2027 EDGE',city:'Offer out',ht:"6'4\"",wt:'225',stars:3,rank:'★★★ · RPM Utah 38%',heat:61,shortSt:'5 days no contact — reach out today',fullSt:'Offer out. Unofficial campus visit March 2026. Follows Coach Breckterfield on X. Spring eval period closes May 31. Last contact 5 days ago.',
+   family:[{init:'GF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Graves Family',role:'Parents visited SLC campus March 2026',phone:'Made up: 480-555-0133'}],
+   offers:['Utah','Big 12 programs competing'],ourOffer:true,
+   stats:'Spring 7v7: 4.7 get-off on 3rd & long flagged. Counter move developing. Reference specific play in outreach. Film brief available.',
+   note:'Contact window open · Spring eval closes May 31 · Reference his spring film specifically.'},
+  {id:'lokey',pos:'EDGE',coach:'breck',status:'top',name:'Logan Lokey',hs:'Denton Guyer HS',city:'Denton, TX',ht:"6'3\"",wt:'220',stars:3,rank:'★★★ · Offer Jan 2026',heat:50,shortSt:"Rowe's teammate · Offered Jan 2026",fullSt:"Offered January 2026. Zane Rowe's former teammate at Denton Guyer HS. (Rowe committed to Oregon.) Strategic opportunity — same coaching staff, same program culture.",
+   family:[{init:'LF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Lokey Family',role:'Denton TX · Early stage relationship',phone:'214-555-0177'}],
+   offers:['Utah','Multiple evaluating'],ourOffer:true,
+   stats:'Denton Guyer TX EDGE. Same coaching staff as Zane Rowe. HS coach relationship with Coach Torres is the key. In-person eval recommended.',
+   note:'HS coach Coach Mike Torres — call him. That relationship drives this recruitment.'},
+  {id:'brown',pos:'EDGE',coach:'breck',status:'offered',name:'Manase Brown',hs:'Corner Canyon HS',city:'Draper, UT',ht:"6'8\"",wt:'225',stars:3,rank:'247 EDGE #54 · UT EDGE #1',heat:42,shortSt:'In-state · 247 EDGE #54 · Evaluating',fullSt:'In-state EDGE from Corner Canyon HS Draper UT. 247 EDGE #54. 6\'8" frame is elite. Geographic advantage for Utah.',
+   family:[{init:'BF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Brown Family',role:'Draper UT · In-state connection',phone:'801-555-0141'}],
+   offers:['Utah','5+ others'],ourOffer:true,
+   stats:"6'8\" EDGE with elite length. Frame projects significant weight addition at Power 4. Pass rush upside is legitimate.",
+   note:'In-state advantage — playing for Utah means playing at home in front of family.'},
+  {id:'ioane',pos:'EDGE',coach:'breck',status:'offered',name:'Jag Ioane',hs:'Orem HS',city:'Orem, UT',ht:"6'2.5\"",wt:'185',stars:3,rank:'247 EDGE #56 · UT EDGE #2',heat:44,shortSt:'In-state · 247 EDGE #56 · Offer Feb 2026',fullSt:'In-state EDGE from Orem HS. 247 EDGE #56. Announced Utah offer February 20, 2026. Needs to add frame weight but has the athleticism.',
+   family:[{init:'IF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Ioane Family',role:'Orem UT · In-state program appeal',phone:'801-555-0155'}],
+   offers:['Utah','2+ others'],ourOffer:true,
+   stats:'Orem HS UT. Needs frame development but elite athleticism. In-state pipeline target.',
+   note:'Utah S&C track record of developing undersized but athletic EDGE players into starters.'},
+  {id:'wolfgramm',pos:'EDGE',coach:'breck',status:'offered',name:'Uhila Wolfgramm',hs:'Maple Mountain HS',city:'Spanish Fork, UT',ht:"6'3\"",wt:'245',stars:3,rank:'247 EDGE #57 · UT EDGE #3',heat:40,shortSt:'In-state · 247 EDGE #57 · Evaluating',fullSt:'In-state EDGE from Maple Mountain HS Spanish Fork UT. 247 EDGE #57. Good base at 6\'3" 245 with room to develop.',
+   family:[{init:'WF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Wolfgramm Family',role:'Spanish Fork UT · In-state',phone:'801-555-0166'}],
+   offers:['Utah','6+ others'],ourOffer:true,
+   stats:"Maple Mountain HS UT. 6'3\" 245. Physical EDGE with good motor. In-state pipeline target.",
+   note:'Spanish Fork to Salt Lake — family can watch every home game.'},
+  {id:'eboigbodin',pos:'EDGE',coach:'breck',status:'offered',name:'Godschoice Eboigbodin',hs:'JSerra Catholic',city:'San Juan Cap., CA',ht:"6'5\"",wt:'235',stars:3,rank:'247 EDGE #35 Natl',heat:38,shortSt:'247 EDGE #35 · California · Evaluating',fullSt:'247 EDGE #35 nationally. JSerra Catholic California. 10+ P5 offers. Elite frame with pass rush upside.',
+   family:[{init:'EF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Eboigbodin Family',role:'Southern California · Premium program',phone:'714-555-0199'}],
+   offers:['Utah','10+ P5 programs'],ourOffer:true,
+   stats:"JSerra Catholic CA. 6'5\" 235. Top-35 EDGE nationally. Elite frame and first step.",
+   note:'OV scheduling is the key next step to make this real.'},
+  // GROSS TARGETS
+  {id:'hildebrand',pos:'OT',coach:'gross',status:'top',name:'Jake Hildebrand',hs:'Basha HS',city:'Chandler, AZ',ht:"6'6\"",wt:'290',stars:4,rank:'247 OT #11 Natl · AZ #1',heat:72,shortSt:'★★★★ OT #11 · OV June 15 · Final 4',fullSt:'Final 4: Utah, Texas A&M, Oregon, ASU. OV June 15–17. ASU visit June 12–14 comes first. Jordan Gross home visit January.',
+   family:[
+     {init:'HF',c:'rgba(74,158,255,0.12)',tc:'#7CB9FF',name:'Hildebrand Family',role:'Chandler AZ · Gross home visit January 2026',phone:'480-555-0101'},
+     {init:'KR',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Coach Kyle Reed',role:'Basha HS HC · Pre-OV contact recommended',phone:'480-555-0102'}
+   ],
+   offers:['Utah','Texas A&M','Oregon','ASU','Multiple earlier offers'],ourOffer:true,
+   stats:'247 OT #11 nationally. 6\'6" 290. Elite OT frame. Footwork in pass protection is advanced for HS level. Spencer Fano / Caleb Lomu development pitch is Utah\'s strongest counter to A&M money.',
+   note:'44 days to OV. Pre-visit contact recommended this week. ASU visits June 12 — your OV is June 15.'},
+  {id:'joshua',pos:'OT',coach:'gross',status:'top',name:'Mason Joshua',hs:'Forney HS',city:'Forney, TX',ht:"6'5\"",wt:'285',stars:3,rank:'247 OT #43 Natl',heat:66,shortSt:'★★★ OT #43 · OV June 5 · Decides July 4',fullSt:'OV Utah June 5–7. Decides July 4. 8 finalists. Tweeted "Where is HOME" tagging Coach Gross and Utah Football April 15.',
+   family:[
+     {init:'JF',c:'rgba(255,179,64,0.12)',tc:'#FFD080',name:'Joshua Family',role:'Forney TX · Father played college football',phone:'972-555-0133'},
+     {init:'DB',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Coach Dan Broten',role:'Forney HS · Logan UT connection',phone:'972-555-0134'}
+   ],
+   offers:['Utah','Florida State','Baylor','Arizona','5+ others total'],ourOffer:true,
+   stats:'247 OT #43. 6\'5" 285. Navy All-American Bowl selection. Arizona OV May 29–31 comes before Utah OV June 5. Tweeted positive Utah signal.',
+   note:'OV June 5. Arizona goes first May 29. Call this week — reinforce why Utah is home.'},
+  {id:'lavataI',pos:'IOL',coach:'gross',status:'offered',name:"Rashaun Lavata'i",hs:'Curtis Sr. HS',city:'Tacoma, WA',ht:"6'3\"",wt:'295',stars:3,rank:'247 IOL #59 Natl · WA IOL #2',heat:58,shortSt:'247 IOL #59 · WA #2 · Offer April 7',fullSt:'Offered April 7, 2026. Followed Jordan Gross on X after offer — green light signal. Competing: Washington, UCLA, Cal, Arizona, Oregon State, Washington State.',
+   family:[{init:'RF',c:'rgba(74,158,255,0.12)',tc:'#7CB9FF',name:"Lavata'i Family",role:'Tacoma WA · Pacific Islander family',phone:'253-555-0188'}],
+   offers:['Utah','Washington','UCLA','Cal','Arizona','Oregon State','Washington State'],ourOffer:true,
+   stats:"Curtis Sr. HS Tacoma WA. 6'3\" 295 IOL. Followed Gross after offer — that is a green light. Text within 48 hours recommended.",
+   note:'Green light signal on X. Text personally within 48 hours. PNW trip opportunity.'},
+  {id:'doyal',pos:'IOL',coach:'gross',status:'offered',name:'Gecova Doyal',hs:'Puyallup HS',city:'Puyallup, WA',ht:"6'3\"",wt:'270',stars:3,rank:'247 IOL #28 Natl · WA IOL #1',heat:46,shortSt:'247 IOL #28 · WA #1 · 11 days no contact',fullSt:'247 IOL #28, WA IOL #1. Offered January 2026. 11 days since last contact — cooling. 18+ competing offers.',
+   family:[{init:'DF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Doyal Family',role:'Puyallup WA · In-person visit needed',phone:'253-555-0144'}],
+   offers:['Utah','Arizona State','Washington','Cal','BYU','Duke','18+ others'],ourOffer:true,
+   stats:"Puyallup HS WA. 6'3\" 270 IOL. WA IOL #1. 11 days no contact — needs outreach.",
+   note:'11 days no contact. Combine PNW trip with Lavata\'i visit. See both in one trip.'},
+  {id:'moala',pos:'IOL',coach:'gross',status:'offered',name:'Calvin Moala',hs:'Chaparral HS',city:'Temecula, CA',ht:"6'3\"",wt:'310',stars:3,rank:'247 CA IOL #3 · Re-offered Jan 26',heat:44,shortSt:'247 CA IOL #3 · Re-offered Jan 2026',fullSt:'247 IOL #3 in California. Re-offered January 26, 2026. Competing: Michigan, Oregon, Stanford, UCLA, Cal, Cincinnati, Kansas, Kansas State.',
+   family:[{init:'MF',c:'rgba(255,179,64,0.12)',tc:'#FFD080',name:'Moala Family',role:'Temecula CA · Southern California family',phone:'951-555-0177'}],
+   offers:['Utah','Michigan','Oregon','Stanford','UCLA','Cal','Cincinnati','Kansas','Kansas State'],ourOffer:true,
+   stats:"Chaparral HS CA. 6'3\" 310 IOL. CA IOL #3. Teammate of QB Dane Weber. Michigan and Oregon are the main competition.",
+   note:'OV scheduling is the key next step. Michigan and Oregon are competing hard.'},
+  {id:'aloisio',pos:'IOL',coach:'gross',status:'offered',name:'Ian Aloisio',hs:'Timpview HS',city:'Provo, UT',ht:"6'4\"",wt:'280',stars:3,rank:'On3 rating 90 · UT IOL #3',heat:55,shortSt:'In-state · On3 90 rating · Evaluating',fullSt:'In-state IOL from Timpview HS Provo UT. On3 rating 90. Utah IOL #3. Warm interest. Geographic advantage for Utah — Provo to Salt Lake.',
+   family:[{init:'AF',c:'rgba(48,209,88,0.12)',tc:'rgba(48,209,88,0.85)',name:'Aloisio Family',role:'Provo UT · In-state · Strong Utah ties',phone:'801-555-0122'}],
+   offers:['Utah','1+ others'],ourOffer:true,
+   stats:"Timpview HS Provo UT. 6'4\" 280. On3 rating 90. In-state. Family can watch every home game at Rice-Eccles.",
+   note:'In-state advantage. Provo to SLC. BYU country — make the Utah development pitch specific.'},
+  {id:'yarborough',pos:'IOL',coach:'gross',status:'offered',name:'DaJohn Yarborough',hs:'Basha HS',city:'Chandler, AZ',ht:"6'5\"",wt:'340',stars:3,rank:'247 IOL #27 Natl',heat:38,shortSt:'247 IOL #27 · 6\'5" 340 · Basha HS',fullSt:"247 IOL #27. Basha HS AZ — same school as Jake Hildebrand. 6'5\" 340 with elite frame. 22+ competing offers.",
+   family:[{init:'YF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Yarborough Family',role:'Chandler AZ · Basha HS',phone:'480-555-0199'}],
+   offers:['Utah','22+ programs'],ourOffer:true,
+   stats:"Basha HS AZ. 6'5\" 340 IOL. Same school as Hildebrand. Elite frame.",
+   note:'Hildebrand connection — visit both during the Chandler trip June 15.'},
+  // SWAN TARGETS
+  {id:'ngata',pos:'LB',coach:'swan',status:'offered',name:'Sam Ngata',hs:'Olympus HS',city:'Salt Lake City, UT',ht:"6'3.5\"",wt:'215',stars:3,rank:'247 LB #66 Natl · UT LB #1',heat:58,shortSt:'In-state LB #66 · SLC · Campus visit',fullSt:'In-state LB from Olympus HS SLC UT. 247 LB #66. Visited Utah campus. 6+ competing offers.',
+   family:[{init:'NF',c:'rgba(74,158,255,0.12)',tc:'#7CB9FF',name:'Ngata Family',role:'Salt Lake City UT · In-state family',phone:'801-555-0133'}],
+   offers:['Utah','6+ others'],ourOffer:true,
+   stats:"Olympus HS SLC. 6'3.5\" 215. In-state LB #1. Visited Utah campus. Playing at home — every snap in front of family.",
+   note:'In-state. Maximum geographic advantage. OV scheduling is the key next step.'},
+  {id:'smith_lb',pos:'LB',coach:'swan',status:'offered',name:'Davon Smith',hs:'Westfield HS',city:'Houston, TX',ht:"5'10.5\"",wt:'220',stars:3,rank:'247 LB #109 · TX LB',heat:42,shortSt:'247 LB #109 · Houston · Evaluating',fullSt:'247 LB #109. Westfield HS Houston TX. 5\'10.5" 220. Competing offers from 2+ programs.',
+   family:[{init:'SF',c:'rgba(255,255,255,0.07)',tc:'rgba(248,249,252,0.5)',name:'Smith Family',role:'Houston TX · Early stage',phone:'713-555-0155'}],
+   offers:['Utah','2+ others'],ourOffer:true,
+   stats:"Westfield HS Houston. 5'10.5\" 220. Instinctive linebacker. Swan development track record is compelling.",
+   note:'Get him to campus for an official visit.'},
+  {id:'gilford',pos:'CB',coach:'swan',status:'offered',name:'Jernaro Gilford Jr.',hs:'Skyridge HS',city:'Lehi, UT',ht:"6'1\"",wt:'170',stars:3,rank:'247 CB #39 Natl · UT CB #1',heat:44,shortSt:'In-state CB #39 Natl · Lehi · Evaluating',fullSt:'247 CB #39 nationally. Skyridge HS Lehi UT. In-state CB #1. 5+ competing offers.',
+   family:[{init:'GF',c:'rgba(74,158,255,0.12)',tc:'#7CB9FF',name:'Gilford Family',role:'Lehi UT · In-state family',phone:'801-555-0177'}],
+   offers:['Utah','5+ others'],ourOffer:true,
+   stats:"Skyridge HS Lehi UT. 6'1\" 170 CB. National top-40 CB. In-state #1. Utah DB development record is strong.",
+   note:'National top-40 CB and he is in your backyard. Make staying home the story.'},
+  {id:'sparrow',pos:'WR',coach:'swan',status:'offered',name:'Bode Sparrow',hs:'Davis HS',city:'Kaysville, UT',ht:"6'2\"",wt:'180',stars:3,rank:'247 WR #74 UT · UT WR #1',heat:55,shortSt:'In-state WR #74 · UT #1 WR · 21 offers',fullSt:'247 WR #74 in Utah. In-state WR from Davis HS Kaysville UT. UT WR #1. 21+ offers.',
+   family:[{init:'SF2',c:'rgba(48,209,88,0.12)',tc:'rgba(48,209,88,0.85)',name:'Sparrow Family',role:'Kaysville UT · In-state family',phone:'801-555-0144'}],
+   offers:['Utah','21+ others'],ourOffer:true,
+   stats:"Davis HS Kaysville UT. 6'2\" 180 WR. In-state #1 WR. 21+ offers. Utah has home advantage.",
+   note:'Kingston Parks is already committed at WR — show Sparrow the depth of the WR room.'},
+  {id:'moseley',pos:'WR',coach:'swan',status:'offered',name:'Darion Moseley',hs:'Thompson HS',city:'Alabaster, AL',ht:"6'0\"",wt:'170',stars:3,rank:'247 WR #100 · OV June 12-14',heat:52,shortSt:'★★★ WR · OV June 12-14 · Alabama',fullSt:'OV Utah June 12–14. Led Alabama 7A with 1,128 receiving yards, 7 TDs in 2025. State champion. Offers: Utah, Arkansas, Arizona State, Kentucky.',
+   family:[{init:'MF2',c:'rgba(74,158,255,0.12)',tc:'#7CB9FF',name:'Moseley Family',role:'Alabaster AL · OV June 12-14',phone:'205-555-0188'}],
+   offers:['Utah','Arkansas','Arizona State','Kentucky'],ourOffer:true,
+   stats:"Thompson HS AL. 6'0\" 170 WR. State champion. 1,128 yards, 7 TDs 2025. OV June 12-14.",
+   note:'OV in 41 days. Pre-visit contact this week. Travel from Alabama — make it worth the trip.'}
+];
+
+// ── STATE ────────────────────────────────────────────────────────────
+let coach = 'scalley';
+let tab = 'board';
+let yr = '2027';
+let pos = 'all';
+let selId = null;
+
+// ── HELPERS ──────────────────────────────────────────────────────────
+function initials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+function heatColor(r){
+  if(r.status==='commit') return {ring:'var(--grn)',txt:'cg'};
+  if(r.status==='top'&&r.heat<50) return {ring:'var(--red)',txt:'cr'};
+  if(r.heat>=65) return {ring:'var(--grn)',txt:'cg'};
+  if(r.heat>=45) return {ring:'var(--amb)',txt:'ca'};
+  return {ring:'var(--red)',txt:'cr'};
+}
+function dot(r){
+  if(r.status==='commit') return 'dg';
+  if(r.status==='top') return 'dr';
+  return 'da';
+}
+function heatSVG(heat,color){
+  const r=16,c=2*Math.PI*r,fill=(heat/100)*c,offset=c-fill;
+  return `<svg width="40" height="40" viewBox="0 0 40 40" style="position:absolute">
+    <circle cx="20" cy="20" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
+    <circle cx="20" cy="20" r="${r}" fill="none" stroke="${color}" stroke-width="2.5" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 20 20)"/>
+  </svg>`;
+}
+
+let toastT=null;
+function toast(m){
+  const el=document.getElementById('toast');
+  if(!el)return;el.textContent=m;el.classList.add('show');
+  if(toastT)clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ── BOARD RENDERING ──────────────────────────────────────────────────
+function getRecruits(){
+  let list = coach==='scalley' ? RECRUITS : RECRUITS.filter(r=>r.coach===coach);
+  if(pos!=='all') list=list.filter(r=>r.pos===pos);
+  return list;
+}
+
+function renderBoard(){
+  const list=getRecruits();
+  const commits=list.filter(r=>r.status==='commit');
+  const top=list.filter(r=>r.status==='top');
+  const offered=list.filter(r=>r.status==='offered');
+  let h='';
+  if(commits.length){h+=`<div class="tier"><div class="tier-name">Committed</div><div class="tier-line"></div><div class="tier-ct">${commits.length}</div></div>`;commits.forEach(r=>h+=rcCard(r));}
+  if(top.length){h+=`<div class="tier"><div class="tier-name">Top Targets</div><div class="tier-line"></div><div class="tier-ct">${top.length}</div></div>`;top.forEach(r=>h+=rcCard(r));}
+  if(offered.length){h+=`<div class="tier"><div class="tier-name">Offers Out</div><div class="tier-line"></div><div class="tier-ct">${offered.length}</div></div>`;offered.forEach(r=>h+=rcCard(r));}
+  if(!h) h='<div style="padding:30px;text-align:center;font-size:14px;color:rgba(248,249,252,0.3)">No recruits match this filter</div>';
+  document.getElementById('board-cards').innerHTML=h;
+}
+
+function rcCard(r){
+  const hc=heatColor(r);
+  const cls=r.status==='commit'?'rc cm':r.status==='top'&&r.heat<50?'rc ug':'rc';
+  const avBg=r.status==='commit'?'rgba(48,209,88,0.12)':r.status==='top'&&r.heat<50?'rgba(204,0,0,0.15)':'rgba(255,179,64,0.12)';
+  const avTc=r.status==='commit'?'#30D158':r.status==='top'&&r.heat<50?'#FF7070':'#FFB340';
+  const stCls=r.status==='commit'?'cg':r.status==='top'?'cr':'ca';
+  return `<div class="${cls}${selId===r.id?' sel':''}" id="rc-${r.id}" onclick="selRecruit('${r.id}')">
+    <div class="rc-av" style="background:${avBg};color:${avTc}">${initials(r.name)}</div>
+    <div class="rc-body">
+      <div class="rc-name">${r.name}</div>
+      <div class="rc-school">${r.hs} · ${r.city} · ${r.pos} · ${r.ht} ${r.wt}</div>
+      <div class="rc-status ${stCls}">${r.shortSt}</div>
+    </div>
+    <div style="position:relative;width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+      ${heatSVG(r.heat,hc.ring)}
+      <span style="font-size:13px;font-weight:800;color:${hc.ring};position:relative;z-index:2">${r.heat}</span>
+    </div>
+  </div>`;
+}
+
+function selRecruit(id){
+  selId=id;
+  const r=RECRUITS.find(x=>x.id===id);
+  if(!r)return;
+  document.querySelectorAll('.rc').forEach(el=>el.classList.remove('sel'));
+  const card=document.getElementById('rc-'+id);
+  if(card)card.classList.add('sel');
+  const hc=heatColor(r);
+  const statusColor=r.status==='commit'?'var(--grn)':r.status==='top'?'var(--red)':'var(--amb)';
+  const statusDotBg=r.status==='commit'?'var(--grn)':r.status==='top'?'var(--red)':'var(--amb)';
+  let familyH=r.family.map(f=>`
+    <div class="pr">
+      <div class="pr-av" style="background:${f.c};color:${f.tc}">${f.init}</div>
+      <div style="flex:1">
+        <div class="pr-name">${f.name}</div>
+        <div class="pr-role">${f.role}</div>
+      </div>
+      <div class="pr-phone">${f.phone}</div>
+    </div>`).join('');
+  let offersH=r.offers.map(o=>`<span class="otag${o.includes('✓')?' ours':''}">${o}</span>`).join('');
+  const panel=`<div class="cp-wrap">
+    <div class="cp-back" onclick="closeCPMobile()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blu)" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>Back to Board
+    </div>
+    <div class="cp-name">${r.name}</div>
+    <div class="cp-sub">${r.pos} · ${r.hs} · ${r.city} · ${r.ht} / ${r.wt} · Class 2027 · ${r.rank}</div>
+    <div class="cp-status-bar">
+      <div class="cp-status-dot" style="background:${statusDotBg}"></div>
+      <div>
+        <div class="cp-status-main" style="color:${statusColor}">${r.shortSt}</div>
+        <div class="cp-status-sub">${r.fullSt.slice(0,120)}${r.fullSt.length>120?'…':''}</div>
+      </div>
+    </div>
+    <div class="cp-grid">
+      <div class="cp-card">
+        <div class="cc-lbl">Family &amp; Key Contacts</div>
+        ${familyH}
+      </div>
+      <div class="cp-card">
+        <div class="cc-lbl">All Confirmed Offers</div>
+        <div class="otags">${offersH}</div>
+      </div>
+      <div class="cp-card full">
+        <div class="cc-lbl">Stats &amp; Film Notes</div>
+        <div class="stats-text">${r.stats}</div>
+      </div>
+    </div>
+    <div class="cp-btns">
+      <div class="cpb cpb-call" onclick="toast('Call log opened for ${r.name.replace(/'/g,"\\'")}')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call Now
+      </div>
+      <div class="cpb cpb-text" onclick="toast('Send from your own phone — personalize it to what you know about this kid')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Send Text
+      </div>
+      <div class="cpb cpb-x" onclick="toast('Opening ${r.name.replace(/'/g,"\\'")} on X')">View on X</div>
+      <div class="cpb cpb-done" onclick="toast('Contact logged and marked done')">Mark Done</div>
+      <div class="cpb cpb-note" onclick="toast('Note added to file')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Add Note to File
+      </div>
+    </div>
+    <div class="src-note">${r.note}</div>
+  </div>`;
+  document.getElementById('board-right').innerHTML=panel;
+  document.getElementById('board-right').classList.add('open');
+}
+
+function closeCPMobile(){
+  const sr=document.getElementById('board-right');
+  if(sr)sr.classList.remove('open');
+}
+
+// ── MY RECRUITS ──────────────────────────────────────────────────────
+// Only shows the players — not parents, not HS coaches
+function renderRecruits(){
+  const list=coach==='scalley'?RECRUITS:RECRUITS.filter(r=>r.coach===coach);
+  const el=document.getElementById('rec-cards');
+  const lbl=document.getElementById('rec-lbl');
+  const ct=document.getElementById('rec-ct');
+  const coachNames={scalley:"Scalley's Full Board",breck:"Breckterfield's Recruits",gross:"Gross's Recruits",swan:"Swan's Recruits"};
+  if(lbl)lbl.textContent=coachNames[coach]||'My Recruits';
+  if(ct)ct.textContent=list.length+' players';
+  let h='';
+  list.forEach(r=>{
+    const avBg=r.status==='commit'?'rgba(48,209,88,0.12)':r.status==='top'?'rgba(204,0,0,0.15)':'rgba(74,158,255,0.12)';
+    const avTc=r.status==='commit'?'#30D158':r.status==='top'?'#FF7070':'#4A9EFF';
+    let issue='',badge='';
+    if(r.status==='commit'){issue=`<div class="rec-ok">Committed — retention active</div>`;badge=`<div class="ok-why">Committed</div>`;}
+    else if(r.status==='top'&&r.heat<50){issue=`<div class="rec-issue">${r.shortSt}</div>`;badge=`<div class="issue-why">Needs contact</div>`;}
+    else if(r.status==='top'){issue=`<div class="rec-watch">${r.shortSt}</div>`;badge=`<div class="watch-why">Top target</div>`;}
+    else{issue=`<div class="rec-watch">${r.shortSt}</div>`;badge=`<div class="watch-why">Offer out</div>`;}
+    h+=`<div class="rec-card" onclick="selRecAndOpen('${r.id}')">
+      <div class="rec-av" style="background:${avBg};color:${avTc}">${initials(r.name)}</div>
+      <div class="rec-body">
+        <div class="rec-name">${r.name}</div>
+        <div class="rec-school">${r.hs} · ${r.city} · ${r.pos} · ${r.ht} ${r.wt}</div>
+        ${issue}
+      </div>
+      <div class="rec-right">
+        <div class="rec-time">${r.stars}★</div>
+        ${badge}
+      </div>
+    </div>`;
+  });
+  if(el)el.innerHTML=h||'<div style="padding:30px;text-align:center;font-size:14px;color:rgba(248,249,252,0.3)">No recruits for this coach</div>';
+}
+
+function selRecAndOpen(id){
+  const r=RECRUITS.find(x=>x.id===id);
+  if(!r)return;
+  const hc=heatColor(r);
+  const statusColor=r.status==='commit'?'var(--grn)':r.status==='top'?'var(--red)':'var(--amb)';
+  let familyH=r.family.map(f=>`
+    <div class="pr">
+      <div class="pr-av" style="background:${f.c};color:${f.tc}">${f.init}</div>
+      <div style="flex:1">
+        <div class="pr-name">${f.name}</div>
+        <div class="pr-role">${f.role}</div>
+      </div>
+      <div class="pr-phone">${f.phone}</div>
+    </div>`).join('');
+  let offersH=r.offers.map(o=>`<span class="otag${o.includes('✓')?' ours':''}">${o}</span>`).join('');
+  const panel=`<div class="rd">
+    <div class="cp-back" onclick="document.getElementById('rec-right').classList.remove('open')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blu)" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>Back to My Recruits
+    </div>
+    <div style="font-size:26px;font-weight:900;color:var(--w1);letter-spacing:-0.5px;margin-bottom:2px">${r.name}</div>
+    <div style="font-size:13px;color:var(--w3);margin-bottom:14px">${r.pos} · ${r.hs} · ${r.city} · ${r.ht} / ${r.wt} · Class 2027 · ${r.rank}</div>
+    <div class="rd-section">
+      <div class="rd-lbl">Status</div>
+      <div style="font-size:15px;font-weight:700;color:${statusColor}">${r.shortSt}</div>
+      <div style="font-size:13px;color:var(--w3);margin-top:4px;line-height:1.6">${r.fullSt}</div>
+    </div>
+    <div class="rd-section">
+      <div class="rd-lbl">Family &amp; Key Contacts — People on the Call</div>
+      ${familyH}
+    </div>
+    <div class="rd-section">
+      <div class="rd-lbl">All Confirmed Offers</div>
+      <div class="otags">${offersH}</div>
+    </div>
+    <div class="rd-section">
+      <div class="rd-lbl">Stats &amp; Film Notes</div>
+      <div class="stats-text">${r.stats}</div>
+    </div>
+    <div class="cp-btns">
+      <div class="cpb cpb-call" onclick="toast('Call log opened for ${r.name.replace(/'/g,"\\'")}')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call Now
+      </div>
+      <div class="cpb cpb-text" onclick="toast('Text from your own phone — personalize it')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Send Text
+      </div>
+      <div class="cpb cpb-x" onclick="toast('Opening on X')">View on X</div>
+      <div class="cpb cpb-done" onclick="toast('Marked done — logged')">Mark Done</div>
+      <div class="cpb cpb-note" onclick="toast('Note added to file')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Add Note to File
+      </div>
+    </div>
+    <div class="src-note">${r.note}</div>
+  </div>`;
+  const rp=document.getElementById('rec-right');
+  if(rp){rp.innerHTML=panel;rp.classList.add('open');}
+}
+
+// ── INTEL DETAIL ─────────────────────────────────────────────────────
+function selIntel(id){
+  const r=RECRUITS.find(x=>x.id===id);
+  if(r)selRecAndOpen(id);else toast('Opening recruit detail');
+}
+function selPortal(id){
+  const data={
+    walker:{name:'Jordan Walker',sub:"Utah State · OT · 6'6\" 305 · Grad Transfer · In Portal 2 days",stats:"28 career starts · PFF Grade 74.2 · 1 year eligibility left · Entered portal 2 days ago · Window: 28 days remain",note:"Jordan Gross knows his high school coach from Logan UT. In-state transfer — Utah State to Utah. Call today. Direct contact is permitted when a player is in the portal.",action:'Call Coach Gross immediately — this fills your critical OT need'},
+    porter:{name:'Marcus Porter',sub:"Colorado State · EDGE · 6'4\" 250 · RS Junior · In Portal",stats:"5.5 sacks 2025 season · PFF Grade 68.1 · 2 years eligibility · 19 days left in portal",note:"Direct contact permitted. 2 years eligibility remaining. Fills the EDGE need.",action:'Direct contact now — 19 days left'}
+  };
+  const d=data[id];if(!d)return;
+  toast(d.name+' — '+d.action);
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────
+function swCoach(c,el){
+  coach=c;
+  document.querySelectorAll('.cchip').forEach(x=>x.classList.remove('on'));
+  if(el)el.classList.add('on');
+  const intel=document.getElementById('intel-hdr-text');
+  if(intel){
+    const posMap={scalley:'all positions',breck:'EDGE / DL positions',gross:'OL positions',swan:'LB / CB / S positions'};
+    intel.innerHTML=`Showing: ${posMap[c]} — <span style="color:var(--blu);cursor:pointer;font-weight:700" onclick="toast('Showing all positions')">Tap here for all positions</span>`;
+  }
+  const recLbl=document.getElementById('rec-lbl');
+  const coachNames={scalley:"Scalley's Full Board",breck:"Breckterfield's Recruits",gross:"Gross's Recruits",swan:"Swan's Recruits"};
+  if(recLbl)recLbl.textContent=coachNames[c]||'My Recruits';
+  if(tab==='board')renderBoard();
+  if(tab==='recruits')renderRecruits();
+}
+
+function swTab(t,navEl,bnEl){
+  tab=t;
+  document.querySelectorAll('.nt').forEach(n=>n.classList.remove('on'));
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  const pane=document.getElementById('pane-'+t);
+  if(pane)pane.classList.add('on');
+  if(navEl)navEl.classList.add('on');
+  else{const nt=document.getElementById('nt-'+t);if(nt)nt.classList.add('on');}
+  if(bnEl)bnEl.classList.add('on');
+  else{const bn=document.getElementById('bn-'+t);if(bn)bn.classList.add('on');}
+  // Show/hide year row and pos filter
+  const yrRow=document.getElementById('yr-row');
+  const posRow=document.getElementById('pos-row');
+  if(yrRow)yrRow.style.display=(t==='board'||t==='watchlist')?'flex':'none';
+  if(posRow)posRow.style.display=t==='board'?'flex':'none';
+  if(t==='board')renderBoard();
+  if(t==='recruits')renderRecruits();
+  // Reset year to 2027 when entering these tabs
+  if(t==='board'||t==='watchlist') swYr('2027',document.getElementById('yr-2027'),true);
+}
+
+function swYr(y,el,silent){
+  yr=y;
+  document.querySelectorAll('.yr').forEach(x=>x.classList.remove('on'));
+  if(el)el.classList.add('on');
+  if(!silent)renderBoard();
+}
+
+function swPos(p,el){
+  pos=p;
+  document.querySelectorAll('.pos').forEach(x=>x.classList.remove('on'));
+  if(el)el.classList.add('on');
+  renderBoard();
+}
+
+// ── ALERTS ───────────────────────────────────────────────────────────
+function openAlerts(){const el=document.getElementById('alert-overlay');if(el)el.classList.add('open');}
+function closeAlerts(e){
+  if(!e||e.target===document.getElementById('alert-overlay')){
+    const el=document.getElementById('alert-overlay');if(el)el.classList.remove('open');
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  renderBoard();
+  renderRecruits();
+  document.getElementById('yr-row').style.display='flex';
+  document.getElementById('pos-row').style.display='flex';
+});
+</script>
+</body>
+</html>

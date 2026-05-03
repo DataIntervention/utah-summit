@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="120" fill="#CC0000"/>
+  <text x="60" y="180" font-family="Arial Black,sans-serif" font-weight="900" font-size="120" fill="white" letter-spacing="8">UTAH</text>
+  <path d="M60 210L60 360Q60 450 256 450Q452 450 452 360L452 210L372 210L372 360Q372 400 256 400Q140 400 140 360L140 210Z" fill="white"/>
+  <path d="M140 210L140 360Q140 400 256 400Q372 400 372 360L372 210L312 210L312 360Q312 376 256 376Q200 376 200 360L200 210Z" fill="#CC0000"/>
+</svg>
